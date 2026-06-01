@@ -12,5 +12,6 @@ export const SITE = {
 export const NAV_LINKS = [
   { href: '/', label: '首页' },
   { href: '/posts', label: '文章' },
+  { href: '/members', label: '成员' },
   { href: '/about', label: '关于' },
 ] as const;

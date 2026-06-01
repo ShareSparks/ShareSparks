@@ -1,0 +1,84 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Avatar from '@/components/Avatar.astro';
+
+export async function getStaticPaths() {
+  const members = await getCollection('members', ({ data }) => !data.draft);
+  return members.map((member) => ({
+    params: { id: member.id },
+    props: { member },
+  }));
+}
+
+const { member } = Astro.props;
+const { name, bio, avatar, links } = member.data;
+const { Content } = await render(member);
+---
+
+<BaseLayout title={name} description={bio}>
+  <article class="profile">
+    <header>
+      <Avatar name={name} src={avatar} size={120} />
+      <div>
+        <h1>{name}</h1>
+        {bio && <p class="bio">{bio}</p>}
+        {
+          links.length > 0 && (
+            <p class="links">
+              {links.map((l) => (
+                <a href={l.url} target="_blank" rel="noopener noreferrer">
+                  {l.label}
+                </a>
+              ))}
+            </p>
+          )
+        }
+      </div>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <p class="back"><a href="/members">← 返回成员</a></p>
+</BaseLayout>
+
+<style>
+  .profile header {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  .profile h1 {
+    margin: 0 0 0.4rem;
+  }
+  .bio {
+    color: var(--muted);
+    margin: 0 0 0.6rem;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0;
+  }
+  .prose :global(h2) {
+    margin-top: 2rem;
+  }
+  .back {
+    margin-top: 3rem;
+  }
+  @media (max-width: 480px) {
+    .profile header {
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+    }
+    .links {
+      justify-content: center;
+    }
+  }
+</style>

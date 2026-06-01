@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Avatar from '@/components/Avatar.astro';
+
+const members = (await getCollection('members', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<BaseLayout title="成员">
+  <h1>成员</h1>
+  <p class="lede">点击头像，了解每位作者。</p>
+
+  <ul class="grid">
+    {
+      members.map((m) => (
+        <li>
+          <a href={`/members/${m.id}/`}>
+            <Avatar name={m.data.name} src={m.data.avatar} size={88} />
+            <span class="name">{m.data.name}</span>
+            {m.data.bio && <span class="bio">{m.data.bio}</span>}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .lede {
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+  .grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+  }
+  .grid a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 1.25rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--fg);
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .grid a:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .name {
+    font-family: var(--font-serif);
+    font-weight: 700;
+  }
+  .bio {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+</style>
