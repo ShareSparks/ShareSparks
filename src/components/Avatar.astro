@@ -1,47 +1,52 @@
 ---
+import { withBase } from "@/utils/path";
+
 interface Props {
-  name: string;
-  src?: string;
-  size?: number;
+	name: string;
+	src?: string;
+	size?: number;
 }
 const { name, src, size = 72 } = Astro.props;
 const initial = name.trim().charAt(0).toUpperCase();
+const resolved = src ? (src.startsWith("http") ? src : withBase(src)) : undefined;
 ---
 
 {
-  src ? (
-    <img
-      class="avatar"
-      src={src}
-      alt={name}
-      width={size}
-      height={size}
-      loading="lazy"
-    />
-  ) : (
-    <span
-      class="avatar avatar-fallback"
-      style={`width:${size}px;height:${size}px;font-size:${Math.round(size * 0.4)}px`}
-    >
-      {initial}
-    </span>
-  )
+	resolved ? (
+		<img
+			class="avatar"
+			src={resolved}
+			alt={name}
+			width={size}
+			height={size}
+			loading="lazy"
+		/>
+	) : (
+		<span
+			class="avatar avatar-fallback"
+			style={`width:${size}px;height:${size}px;font-size:${Math.round(size * 0.4)}px`}
+			aria-hidden="true"
+		>
+			{initial}
+		</span>
+	)
 }
 
 <style>
-  .avatar {
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-  .avatar-fallback {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--accent);
-    color: #fff;
-    font-family: var(--font-serif);
-    font-weight: 700;
-    line-height: 1;
-  }
+	.avatar {
+		border-radius: 50%;
+		object-fit: cover;
+		flex-shrink: 0;
+		border: 1px solid var(--hairline);
+	}
+	.avatar-fallback {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: hsl(var(--theme-accent) / 0.14);
+		color: hsl(var(--theme-accent));
+		font-family: var(--font-serif);
+		font-weight: 600;
+		line-height: 1;
+	}
 </style>

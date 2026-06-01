@@ -2,61 +2,100 @@
 
 > 兀坐听雪溜竟日，闲谈生慧火一星。
 
-一个用来分享文章的个人站点。基于 [Astro](https://astro.build)（纯静态输出），
-准备部署到 [Cloudflare](https://developers.cloudflare.com/)。
+**English** | [简体中文](./README.zh-CN.md)
 
-## 开发
+A repository for sharing personal insights — where we record ideas, refine
+articles, and exchange perspectives.
+
+🌐 **Live site**: <https://sharesparks.dev> — read everything right in your
+browser, no need to clone the repo.
+
+Built with [Astro](https://astro.build) on the
+[Sienna](https://github.com/AnjayGoel/astro-sienna) theme (serif typography,
+light/dark mode, RSS, full-text search, OG images) and deployed on
+[Cloudflare](https://developers.cloudflare.com/); every push to `main` updates
+the site automatically.
+
+## Development
 
 ```bash
-pnpm install      # 安装依赖
-pnpm dev          # 本地开发，http://localhost:4321
-pnpm build        # 构建到 ./dist
-pnpm preview      # 预览构建产物
+pnpm install      # install dependencies
+pnpm dev          # local dev server at http://localhost:4321
+pnpm build        # type-check + build to ./dist (also runs Pagefind search index)
+pnpm preview      # preview the production build
 ```
 
-## 写文章
+## Writing an article
 
-在 `src/content/posts/` 下新建 `.md`（或需要嵌入组件时用 `.mdx`），顶部填写
-frontmatter：
+Create a `.md` file (or `.mdx` for embedded components) under
+`src/content/post/`. The filename becomes the URL slug.
 
 ```markdown
 ---
-title: 标题
-description: 一句话简介（可选）
-pubDate: 2026-06-01
-tags: ['随笔']
-draft: false   # true 时不会出现在生产构建
+title: "Title"
+publishDate: 2026-06-01
+description: "One-line summary (10–160 characters)."
+tags: [note]
+draft: false   # true keeps it out of the production build
 ---
 
-正文……
+Body…
 ```
 
-保存后会自动出现在首页、`/posts` 列表和 RSS 中。
+It then appears on the home page, the `/posts` list, the RSS feed, and search.
+Code blocks get syntax highlighting + a copy button, and KaTeX math is supported.
 
-## 目录结构
+## Adding a member
+
+Each person is one file under `src/content/member/`. The filename becomes the
+URL (e.g. `liu.md` → `/members/liu`).
+
+```markdown
+---
+name: Name
+bio: One-line intro
+avatar: /avatars/name.jpg   # optional; falls back to an initial-letter avatar
+order: 1                     # lower number shows first
+links:
+  - label: GitHub
+    url: https://github.com/name
+---
+
+Longer introduction in Markdown…
+```
+
+Put avatar images in `public/avatars/` (square images work best). Members appear
+on `/members` and on the home page; each has a detail page at `/members/<filename>`.
+
+## Project structure
 
 ```
 src/
-├── consts.ts            # 站点标题、URL、导航等全局配置
-├── content.config.ts    # 文章集合的 schema 定义
-├── content/posts/       # 文章（Markdown / MDX）
-├── components/          # Header / Footer / 日期等组件
-├── layouts/             # 页面与文章布局
-├── pages/               # 路由（首页、列表、文章、关于、rss.xml）
-└── styles/global.css    # 全局样式
-public/                  # 静态资源（favicon 等）
+├── site.config.ts       # site title, description, nav menu, profile, theme options
+├── content.config.ts    # schemas for the post / page / member collections
+├── content/post/        # articles (Markdown / MDX)
+├── content/member/      # one file per person
+├── content/page/        # standalone pages (e.g. about.md)
+├── components/          # header, footer, avatar, theme toggle, etc.
+├── data/                # collection helpers (post.ts, member.ts)
+├── layouts/             # Base & BlogPost layouts
+├── pages/               # routes (home, posts, members, about, rss, og-image…)
+├── plugins/             # remark/rehype plugins (admonitions, reading time…)
+└── styles/global.css    # design tokens (colors, fonts) + base styles
+public/                  # static assets (icon, avatars, _headers…)
 ```
 
-## 部署到 Cloudflare
+## Deploying to Cloudflare
 
-纯静态产物在 `./dist`，已附 `wrangler.jsonc`（Workers 静态资源方式）。
+The static build lands in `./dist`; `wrangler.jsonc` is included (Workers
+static-assets mode).
 
-- **Cloudflare 控制台连 GitHub**：框架选 Astro，构建命令 `pnpm build`，
-  输出目录 `dist`。推荐，推送即自动部署。
-- **命令行**：`pnpm cf:deploy`（= `astro build && wrangler deploy`）。
+- **Cloudflare dashboard + GitHub**: framework preset Astro, build command
+  `pnpm build`, output directory `dist`. Recommended — deploys on every push.
+  (`.npmrc` enables the `postbuild` Pagefind step.)
+- **CLI**: `pnpm build && wrangler deploy`.
 
-部署好域名后，记得把 `src/consts.ts` 里的 `SITE.url` 改成正式域名
-（影响 sitemap / RSS / canonical 链接）。
+If the domain changes, update `site` in `astro.config.ts` (it drives the
+sitemap, RSS, OG images, and canonical links).
 
-> 之后若需要服务端渲染（SSR），安装 `@astrojs/cloudflare` 适配器，
-> 并在 `astro.config.mjs` 中改为 `output: 'server'`。
+> Theme credit: [Astro Sienna](https://github.com/AnjayGoel/astro-sienna) by Anjay Goel (MIT).

@@ -1,0 +1,150 @@
+---
+import Avatar from "@/components/Avatar.astro";
+import { getAllMembers } from "@/data/member";
+import PageLayout from "@/layouts/Base.astro";
+import { withBase } from "@/utils/path";
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { render } from "astro:content";
+
+export const getStaticPaths = (async () => {
+	const members = await getAllMembers();
+	return members.map((entry) => ({
+		params: { slug: entry.id },
+		props: { entry },
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { entry } = Astro.props;
+const { name, bio, avatar, links } = entry.data;
+const { Content } = await render(entry);
+---
+
+<PageLayout meta={{ title: name, description: bio ?? `${name} — ShareSparks 成员。` }}>
+	<article class="profile">
+		<header class="head">
+			<Avatar name={name} src={avatar} size={108} />
+			<div class="meta">
+				<h1>{name}</h1>
+				{bio && <p class="bio">{bio}</p>}
+				{
+					links.length > 0 && (
+						<p class="links">
+							{links.map((l) => (
+								<a href={l.url} rel="noreferrer" target="_blank">
+									{l.label}
+								</a>
+							))}
+						</p>
+					)
+				}
+			</div>
+		</header>
+
+		<div class="bio-body">
+			<Content />
+		</div>
+	</article>
+
+	<p class="back"><a data-astro-prefetch href={withBase("/members/")}>← 返回成员</a></p>
+</PageLayout>
+
+<style>
+	.profile {
+		margin-bottom: 48px;
+	}
+	.head {
+		display: flex;
+		gap: 24px;
+		align-items: center;
+		margin-bottom: 36px;
+	}
+	.head h1 {
+		font-family: var(--font-serif);
+		font-size: 30px;
+		line-height: 1.14;
+		letter-spacing: -0.02em;
+		margin: 0 0 8px;
+	}
+	.bio {
+		font-family: var(--font-serif);
+		font-size: 18px;
+		line-height: 1.55;
+		color: hsl(var(--theme-text-muted));
+		margin: 0 0 10px;
+		text-wrap: pretty;
+	}
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		margin: 0;
+		font-family: var(--font-sans);
+		font-size: 13.5px;
+	}
+	.links a {
+		color: hsl(var(--theme-text-muted));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		transition: color 0.2s ease, text-decoration-color 0.2s ease;
+	}
+	.links a:hover {
+		color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
+	}
+
+	.bio-body {
+		font-family: var(--font-serif);
+		font-size: 17.5px;
+		line-height: 1.75;
+		color: hsl(var(--theme-text));
+		max-width: var(--reading-width);
+	}
+	.bio-body :global(p) {
+		margin: 0 0 22px;
+		text-wrap: pretty;
+	}
+	.bio-body :global(p:last-child) {
+		margin-bottom: 0;
+	}
+	.bio-body :global(a) {
+		color: hsl(var(--theme-text));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+	.bio-body :global(a:hover) {
+		color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
+	}
+
+	.back {
+		font-family: var(--font-sans);
+		font-size: 13.5px;
+	}
+	.back a {
+		color: hsl(var(--theme-text-muted));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-underline-offset: 3px;
+	}
+	.back a:hover {
+		color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
+	}
+
+	@media (max-width: 480px) {
+		.head {
+			flex-direction: column;
+			text-align: center;
+			gap: 16px;
+		}
+		.links {
+			justify-content: center;
+		}
+	}
+</style>
