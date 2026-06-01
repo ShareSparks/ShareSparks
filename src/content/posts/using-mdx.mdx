@@ -1,0 +1,18 @@
+---
+title: 用 MDX 写一篇带组件的文章
+description: 演示 .mdx 如何在 Markdown 里混入组件与表达式。
+pubDate: 2026-06-02
+tags: ['指南']
+draft: true
+---
+
+这是一篇 MDX 示例文章（`draft: true`，默认不会在生产构建里出现）。
+
+MDX 让你在 Markdown 中直接写 JSX 表达式，比如算式：{1 + 2 + 3}。
+
+也可以导入并使用 Astro / 框架组件：
+
+{/* import SomeComponent from '@/components/SomeComponent.astro'; */}
+{/* <SomeComponent /> */}
+
+平时不需要这些能力时，用 `.md` 就够了。

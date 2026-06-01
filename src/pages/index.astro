@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { SITE } from '@/consts';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const recent = posts.slice(0, 5);
+---
+
+<BaseLayout>
+  <section class="intro">
+    <h1>{SITE.title}</h1>
+    <p>{SITE.description}</p>
+  </section>
+
+  <section class="post-list">
+    <h2>最新文章</h2>
+    <ul>
+      {
+        recent.map((post) => (
+          <li>
+            <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+            <FormattedDate date={post.data.pubDate} />
+          </li>
+        ))
+      }
+    </ul>
+    {posts.length > 5 && <p><a href="/posts">查看全部 →</a></p>}
+  </section>
+</BaseLayout>
+
+<style>
+  .intro {
+    margin-bottom: 3rem;
+  }
+  .intro p {
+    color: var(--muted);
+  }
+  .post-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  .post-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .post-list li time {
+    color: var(--muted);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+</style>

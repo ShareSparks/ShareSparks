@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<BaseLayout title="文章">
+  <h1>文章</h1>
+  <ul class="post-list">
+    {
+      posts.map((post) => (
+        <li>
+          <a class="title" href={`/posts/${post.id}/`}>
+            {post.data.title}
+          </a>
+          {post.data.description && (
+            <p class="desc">{post.data.description}</p>
+          )}
+          <FormattedDate date={post.data.pubDate} />
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .post-list {
+    list-style: none;
+    padding: 0;
+  }
+  .post-list li {
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .title {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  .desc {
+    color: var(--muted);
+    margin: 0.3rem 0 0.5rem;
+  }
+  .post-list li time {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+</style>

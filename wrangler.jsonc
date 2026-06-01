@@ -1,0 +1,11 @@
+{
+  // Cloudflare Workers config for serving the static build.
+  // Docs: https://developers.cloudflare.com/workers/static-assets/
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sharesparks",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    // Astro's static build output.
+    "directory": "./dist"
+  }
+}
