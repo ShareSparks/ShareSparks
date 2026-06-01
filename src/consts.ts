@@ -2,8 +2,8 @@
 export const SITE = {
   title: 'ShareSparks',
   description: '兀坐听雪溜竟日，闲谈生慧火一星。',
-  // Your production URL — update once the Cloudflare domain is ready.
-  url: 'https://sharesparks.pages.dev',
+  // Production URL.
+  url: 'https://sharesparks.dev',
   author: '',
   lang: 'zh-CN',
 } as const;
