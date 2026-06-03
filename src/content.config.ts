@@ -12,6 +12,9 @@ const post = defineCollection({
 	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/post" }),
 	schema: ({ image }) =>
 		z.object({
+			// Optional member id (filename under src/content/member, e.g. "liu").
+			// When set, the byline shows that member's name and links to their page.
+			author: z.string().optional(),
 			coverImage: z
 				.object({
 					alt: z.string(),

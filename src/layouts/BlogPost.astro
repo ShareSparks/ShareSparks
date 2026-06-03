@@ -4,6 +4,7 @@ import { Image } from "astro:assets";
 
 import ShareButtons from "@/components/blog/ShareButtons.astro";
 import WebMentions from "@/components/blog/webmentions/index.astro";
+import { getAllMembers } from "@/data/member";
 import { getAllPosts, getPostSortDate, sortMDByDate } from "@/data/post";
 import { siteConfig } from "@/site-config";
 import { formatBylineDate, formatEyebrowDate } from "@/utils/date";
@@ -23,14 +24,18 @@ const idx = sortedAll.findIndex((p) => p.id === post.id);
 const newerPost = idx > 0 ? sortedAll[idx - 1] : undefined;
 const olderPost = idx >= 0 && idx < sortedAll.length - 1 ? sortedAll[idx + 1] : undefined;
 const {
-	data: { coverImage, description, ogImage, publishDate, title, updatedDate, tags, draft },
+	data: { author, coverImage, description, ogImage, publishDate, title, updatedDate, tags, draft },
 	id: slug,
 } = post;
 const socialImage = ogImage ?? `/og-image/${slug}.png`;
 const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString();
 const { remarkPluginFrontmatter } = await render(post);
 
-const authorName = siteConfig.profile?.name ?? siteConfig.author;
+// Resolve the post's author to a member (by file id). Falls back to the
+// site-wide author when `author` is unset or doesn't match a member.
+const authorMember = author ? (await getAllMembers()).find((m) => m.id === author) : undefined;
+const authorName = authorMember?.data.name ?? siteConfig.profile?.name ?? siteConfig.author;
+const authorUrl = authorMember ? withBase(`/members/${authorMember.id}/`) : undefined;
 const comments = siteConfig.comments;
 const postUrl = absoluteUrl(`/posts/${slug}/`, Astro.site);
 const socialImageAbsolute = absoluteUrl(socialImage, Astro.site);
@@ -82,7 +87,12 @@ const giscusThemes = import.meta.env.PROD
 				{draft && <span class="draft-flag">(Draft)</span>}
 				<h1 class="post-title">{title}</h1>
 				<p class="byline">
-					{authorName && <>By {authorName}<span class="sep">·</span></>}{bylineDate}{readingTime && (
+					{authorName && (
+						<>
+							By {authorUrl ? <a class="byline-author" href={authorUrl}>{authorName}</a> : authorName}
+							<span class="sep">·</span>
+						</>
+					)}{bylineDate}{readingTime && (
 						<>
 							<span class="sep">·</span>{readingTime}
 						</>
