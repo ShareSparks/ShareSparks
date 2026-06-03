@@ -29,7 +29,9 @@
 		--font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
 
 		/* Layout tokens — shared across home, posts archive, and article pages */
-		--reading-width: 64ch;          /* article body & long prose blocks */
+		/* Article body — adaptive: compact on narrow screens, grows with the
+		   viewport up to a readable max (~44 全角字/行) on wide screens. */
+		--reading-width: clamp(34rem, 62vw, 48rem);
 		--rail-width: 110px;            /* left date column on timeline lists */
 		--rail-gap: 36px;               /* gap between rail and post body */
 	}

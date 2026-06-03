@@ -19,6 +19,35 @@ const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${enco
 <div class="share">
 	<span class="share-label">Share</span>
 	<div class="share-buttons">
+		<button
+			class="share-btn share-native"
+			type="button"
+			data-share-native
+			data-title={title}
+			data-text={tweetText}
+			data-url={url}
+			aria-label="分享到…"
+			hidden
+		>
+			<svg
+				aria-hidden="true"
+				focusable="false"
+				width="14"
+				height="14"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.8"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"></path>
+				<polyline points="8 7 12 3 16 7"></polyline>
+				<line x1="12" y1="3" x2="12" y2="15"></line>
+			</svg>
+			<span>分享</span>
+		</button>
+
 		<a
 			class="share-btn"
 			href={twitterHref}
@@ -157,6 +186,12 @@ const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${enco
 		color: hsl(var(--theme-bg));
 		border-color: hsl(var(--theme-accent));
 	}
+	/* Native share is the primary action where supported — fill it. */
+	.share-native {
+		color: hsl(var(--theme-bg));
+		background: hsl(var(--theme-accent));
+		border-color: hsl(var(--theme-accent));
+	}
 
 	@media (max-width: 420px) {
 		.share { gap: 10px; }
@@ -165,6 +200,26 @@ const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${enco
 </style>
 
 <script>
+	// Native system share sheet (mobile / supported browsers). On a phone this is
+	// one tap to WeChat / Weibo / anywhere; on unsupported browsers it stays hidden
+	// and the explicit X / LinkedIn / copy buttons remain the fallback.
+	if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+		document.querySelectorAll<HTMLButtonElement>("[data-share-native]").forEach((btn) => {
+			btn.hidden = false;
+			btn.addEventListener("click", async () => {
+				try {
+					await navigator.share({
+						title: btn.dataset.title,
+						text: btn.dataset.text,
+						url: btn.dataset.url ?? window.location.href,
+					});
+				} catch {
+					// User cancelled the share sheet — nothing to do.
+				}
+			});
+		});
+	}
+
 	document.querySelectorAll<HTMLButtonElement>("[data-share-copy]").forEach((btn) => {
 		const label = btn.querySelector<HTMLElement>(".share-copy-label");
 		const original = label?.textContent ?? "Copy link";

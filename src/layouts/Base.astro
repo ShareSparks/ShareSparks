@@ -65,7 +65,9 @@ const {
 
 			/* Sticky footer: wrap fills viewport, main grows to push footer down */
 			.wrap {
-				max-width: 760px;
+				/* Raised from 760px so the adaptive reading column has room to grow
+				   on wide screens; still capped to keep line length readable. */
+				max-width: min(92vw, 920px);
 				margin: 0 auto;
 				padding: 36px max(32px, env(safe-area-inset-right))
 					max(80px, env(safe-area-inset-bottom)) max(32px, env(safe-area-inset-left));
